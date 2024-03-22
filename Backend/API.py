@@ -26,7 +26,7 @@ async def ping(request: Request):
     return {"message":"Pingged"}
 
 @app.get("/api/FindPrompt")
-async def bard_call(request: Request,api_key: str, Title: str):
+async def bard_call(request: Request,api_key: str, Title: str, Security:int):
     if api_key=="4652424":
         message=DB.findPrompt(Title)
         return message
@@ -41,34 +41,34 @@ async def bard_call(request: Request,api_key: str, Title: str):
     else:
         return {"message":"Acess Error"}
     
-@app.get("/api/AddPrompt")
-async def bard_call(request: Request,api_key: str, Title: str,Security:int, Description: str, Role: str, SdlcPhase: int, Models: str, Results: str):
+@app.get("/api/AddPrompt")###########
+async def bard_call(request: Request,api_key: str, Data:str):
     if api_key=="4652424":
-        message=DB.addPrompt(Title,Security, Description, Role, SdlcPhase, Models, Results)
+        message=DB.addPrompt(Data)
         return message
     else:
         return {"message":"Acess Error"}
 
-@app.get("/api/AddFormat")
-async def bard_call(request: Request,api_key: str, Title: str, Description: str):
+@app.get("/api/AddFormat")###############
+async def bard_call(request: Request,api_key: str, Data: str):
     if api_key=="4652424":
-        message=DB.addFormat(Title, Description)
+        message=DB.addFormat(Data)
         return {"status":message} 
     else:
         return {"message":"Acess Error"}
     
 @app.get("/api/RemovePrompt")
-async def bard_call(request: Request,api_key: str, Title: str):
+async def bard_call(request: Request,api_key: str,Username:str, Title: str):
     if api_key=="4652424":
-        message=DB.removePrompt(Title)
+        message=DB.removePrompt(Username, Title)
         return {"status":message} 
     else:
         return {"message":"Acess Error"}   
 
 @app.get("/api/RemoveFormat")
-async def bard_call(request: Request,api_key: str, Title: str):
+async def bard_call(request: Request,api_key: str,Username:str, Title: str):
     if api_key=="4652424":
-        message=DB.removeFormat(Title)
+        message=DB.removeFormat(Username, Title)
         return {"status":message} 
     else:
         return {"message":"Acess Error"}  

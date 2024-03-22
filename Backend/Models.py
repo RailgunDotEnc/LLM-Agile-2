@@ -109,7 +109,7 @@ def gemini_chat(prompt,model_history):
     new_model_history["model_history"].update(model_history)
     new_model_history["model_history"].update({f"Question_{key_num+1}": [prompt,response["response"]]})
     message["gemini"].update(response)
-    message.update(new_model_history)
+    message["gemini"].update(new_model_history)
     return message
 
 #########################################################################################################
@@ -152,7 +152,7 @@ def gpt_chat(prompt,model_history):
     new_model_history["model_history"].update(model_history)
     new_model_history["model_history"].update({f"Question_{key_num+1}": [prompt,response["response"]]})
     message["gpt"].update(response)
-    message.update(new_model_history)
+    message["gpt"].update(new_model_history)
     return message
 
 #########################################################################################################
@@ -199,7 +199,7 @@ def claude_chat(prompt,model_history):
     new_model_history["model_history"].update(model_history)
     new_model_history["model_history"].update({f"Question_{key_num+1}": [prompt,response["response"]]})
     message["claude"].update(response)
-    message.update(new_model_history)
+    message["claude"].update(new_model_history)
     return message
 
 #########################################################################################################
