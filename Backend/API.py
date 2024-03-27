@@ -1,6 +1,8 @@
 import FireDB as DB
 import Models as MD
 import uvicorn
+import requests
+import base64
 from fastapi import FastAPI,  Request
 
 import socket
@@ -53,7 +55,7 @@ async def bard_call(request: Request,api_key: str, Data:str):
 async def bard_call(request: Request,api_key: str, Data: str):
     if api_key=="4652424":
         message=DB.addFormat(Data)
-        return {"status":message} 
+        return {"status":message}
     else:
         return {"message":"Acess Error"}
     
@@ -61,17 +63,17 @@ async def bard_call(request: Request,api_key: str, Data: str):
 async def bard_call(request: Request,api_key: str,Username:str, Title: str):
     if api_key=="4652424":
         message=DB.removePrompt(Username, Title)
-        return {"status":message} 
+        return {"status":message}
     else:
-        return {"message":"Acess Error"}   
+        return {"message":"Acess Error"}
 
 @app.get("/api/RemoveFormat")
 async def bard_call(request: Request,api_key: str,Username:str, Title: str):
     if api_key=="4652424":
         message=DB.removeFormat(Username, Title)
-        return {"status":message} 
+        return {"status":message}
     else:
-        return {"message":"Acess Error"}  
+        return {"message":"Acess Error"}
     
 @app.get("/api/Model")
 async def bard_call(request: Request,api_key: str,Model:str, Prompt: str, History:str= "none"):
@@ -79,11 +81,21 @@ async def bard_call(request: Request,api_key: str,Model:str, Prompt: str, Histor
         message=MD.model_manager(Model,Prompt,History)
         return message
     else:
-        return {"Error":"Acess Error"}  
+        return {"Error":"Acess Error"}
 
 
 if __name__ == '__main__':
     host_name = socket.gethostname()
     IP_address=socket.gethostbyname(host_name)
     print("Using IP:", IP_address)
-    uvicorn.run("API:app", host=IP_address, port=364, workers=4) 
+    uvicorn.run("API:app", host=IP_address, port=364, workers=4)
+
+# jira
+def get_encoded_credentials(email: str, api_token: str) -> str:
+    credentials = f"{email}:{api_token}"
+    encoded_credentials = base64.b64encode(credentials.encode('utf-8')).decode('utf-8')
+    return encoded_credentials
+
+def make_get_request(url: str, headers: dict, params: dict) -> requests.Response:
+    response = requests.get(url, headers=headers, params=params)
+    return response
