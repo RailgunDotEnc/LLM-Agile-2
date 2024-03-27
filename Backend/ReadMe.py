@@ -12,7 +12,7 @@ Psecurity=-1
 jsonPromptExample={Ptitle: 
                     {Pusername:{
                         "Prompt":Pprompt,
-                        "gemini":
+                        models:{"gemini":
                             {"model_history":{
                                  "Question_1":["What color is an apple","red"],
                                  "Question_2":["What was the first question","What color is an apple"]}
@@ -21,7 +21,9 @@ jsonPromptExample={Ptitle:
                             {"model_history":{
                                  "Question_1":["What color is an apple","red"],
                                  "Question_2":["What was the first question","What color is an apple"]}
-                             },
+                             }
+                             
+                        },
                         "SDLC": PSLC,
                         "Security": Psecurity
                         }
