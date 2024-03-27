@@ -2,11 +2,15 @@ import FireDB as DB
 import Models as MD
 import uvicorn
 from fastapi import FastAPI,  Request
-
+from fastapi.middleware.cors import CORSMiddleware
 import socket
 #Test functions
 #addPrompt("NewPromptName",new_prompt['NewPromptName']['Description'],new_prompt['NewPromptName']['Role'],new_prompt['NewPromptName']['SdlcPhase'])
 #removePrompt("NewPromptName")
+origins = [
+    "http://localhost:3000/",  # Adjust this to the domain of your frontend application
+    # Add other allowed origins as needed
+]
 
 #addFormat("NewFormatName",new_format['NewFormatName']['Description'])
 #removeFormat("NewFormatName")
@@ -15,7 +19,13 @@ app = FastAPI()
 #KEY FOR SECURITY LEVEL 1
 #KEY FOR SECRUTIY LEVEL 2
 #FRONT_END OWNS KEY
-
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=[""],
+    allow_headers=[""],
+)
 
 #api_key=4652424&Title=Test
 #Find Prompt
