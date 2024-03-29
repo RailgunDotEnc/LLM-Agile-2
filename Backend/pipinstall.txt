@@ -1,0 +1,17 @@
+pip install firedb
+
+pip install firebase-admin
+
+pip install ipython
+
+pip install google-generativeai
+
+pip install torch
+
+pip install anthropic
+
+pip install transformers
+
+pip install uvicorn
+
+pip install fastapi
