@@ -4,6 +4,7 @@ import uvicorn
 from fastapi import FastAPI,  Request
 from fastapi.middleware.cors import CORSMiddleware
 import socket
+import Settings as ST
 #Test functions
 #addPrompt("NewPromptName",new_prompt['NewPromptName']['Description'],new_prompt['NewPromptName']['Role'],new_prompt['NewPromptName']['SdlcPhase'])
 #removePrompt("NewPromptName")
@@ -14,7 +15,28 @@ origins = [
 
 #addFormat("NewFormatName",new_format['NewFormatName']['Description'])
 #removeFormat("NewFormatName")
+#API Key Manager
+#Example key: xyz12345abcde
+def check_Key(key):
+    print(key[0:3],ST.default_key)
+    print(key[8:13],ST.key_levels[0])
+    if not (key[0:3]==ST.default_key):
+        return -2
+    elif key[8:13]==ST.key_levels[0]:
+        return 1
+    elif key[8:13]==ST.key_levels[1]:
+        return 2
+    elif key[8:13]==ST.key_levels[2]:
+        return 3
+    elif key[8:13]==ST.key_levels[3]:
+        return 4
+    elif key[8:13]==ST.key_levels[4]:
+        return 5
+    else:
+        return -1
     
+        
+
 app = FastAPI()
 #KEY FOR SECURITY LEVEL 1
 #KEY FOR SECRUTIY LEVEL 2
@@ -27,33 +49,48 @@ app.add_middleware(
     allow_headers=[""],
 )
 
-#api_key=4652424&Title=Test
+#
 #Find Prompt
 #NEEDS SECURITY LEVEL CHECK
 #REPLACE API KEY WITH SECURITY LEVEL
 @app.get("/")
-async def ping(request: Request):
-    return {"message":"Pingged"}
+async def ping(request: Request, api_key: str):
+    level=check_Key(api_key)
+    if level==-2:
+        message="Access not allowed"
+    elif level==-1:
+        message="LV -1: public access"
+    elif level==1:
+        message="LV 1: access"
+    elif level==2:
+        message="LV 2: access"
+    elif level==3:
+        message="LV 3: access"
+    elif level==4:
+        message="LV 4: access"
+    elif level==5:
+        message="LV 5: access"
+    return {"message":message}
 
 @app.get("/api/FindPrompt")
-async def bard_call(request: Request,api_key: str, Title: str, Security:int):
-    if api_key=="4652424":
-        message=DB.findPrompt(Title)
+async def bard_call(request: Request,api_key: str, Title: str):
+    if check_Key(api_key)!=-2:
+        message=DB.findPrompt(Title,check_Key(api_key))
         return message
     else:
         return {"message":"Acess Error"}
 
 @app.get("/api/FindFormat")
 async def bard_call(request: Request,api_key: str, Title: str):
-    if api_key=="4652424":
-        message=DB.findFormat(Title)
+    if check_Key(api_key)!=-2:
+        message=DB.findFormat(Title,check_Key(api_key))
         return message
     else:
         return {"message":"Acess Error"}
     
 @app.get("/api/AddPrompt")###########
 async def bard_call(request: Request,api_key: str, Data:str):
-    if api_key=="4652424":
+    if check_Key(api_key)!=-2:
         message=DB.addPrompt(Data)
         return message
     else:
@@ -61,7 +98,7 @@ async def bard_call(request: Request,api_key: str, Data:str):
 
 @app.get("/api/AddFormat")###############
 async def bard_call(request: Request,api_key: str, Data: str):
-    if api_key=="4652424":
+    if check_Key(api_key)!=-2:
         message=DB.addFormat(Data)
         return {"status":message} 
     else:
@@ -69,15 +106,15 @@ async def bard_call(request: Request,api_key: str, Data: str):
     
 @app.get("/api/RemovePrompt")
 async def bard_call(request: Request,api_key: str,Username:str, Title: str):
-    if api_key=="4652424":
-        message=DB.removePrompt(Username, Title)
+    if check_Key(api_key)!=-2:
+        message=DB.removePrompt(Username, Title,check_Key(api_key))
         return {"status":message} 
     else:
         return {"message":"Acess Error"}   
 
 @app.get("/api/RemoveFormat")
 async def bard_call(request: Request,api_key: str,Username:str, Title: str):
-    if api_key=="4652424":
+    if check_Key(api_key)!=-2:
         message=DB.removeFormat(Username, Title)
         return {"status":message} 
     else:
@@ -85,7 +122,7 @@ async def bard_call(request: Request,api_key: str,Username:str, Title: str):
     
 @app.get("/api/Model")
 async def bard_call(request: Request,api_key: str,Model:str, Prompt: str, History:str= "none"):
-    if api_key=="4652424":
+    if check_Key(api_key)!=-2:
         message=MD.model_manager(Model,Prompt,History)
         return message
     else:

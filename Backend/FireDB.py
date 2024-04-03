@@ -11,35 +11,50 @@ import json
 cred = credentials.Certificate(ST.cred_file)
 firebase_admin.initialize_app(cred, {"databaseURL": ST.database_url})
 
+#Helper functions
+def filter_users(data, security_lv):
+    if 'Test' in data:
+        tests = data['Test']
+        filtered_tests = {}
+        for test_name, test_data in tests.items():
+            user_security = test_data.get('Security', 0)  # Assuming default security level is 0 if not specified
+            if user_security <= security_lv:
+                filtered_tests[test_name] = test_data
+
+        data['Test'] = filtered_tests
+
+    return data
+
 def construct_json(Title, Prompt, Role, SdlcPhase, History):
     new_dict={"Title":Title, "Prompt":Prompt, "Role":Role,"SdlcPhase":SdlcPhase,"History":History}
 
 
-def findPrompt(title):
+#Database calls
+def findPrompt(title,security_lv):
     print(title)
     ref = db.reference('/Prompts')
     # Query to find the object with the title 'NewPromptName'
     query = ref.order_by_key().equal_to(title)
     result = query.get()
-    return result
+    result_filtered=filter_users(result,security_lv)
+    return result_filtered
 
 def findFormat(title):
     ref = db.reference('/Formats')
-    # Query to find the object with the title 'NewPromptName'
     query = ref.order_by_key().equal_to(title)
     result = query.get()
+    print(result)
     return result
 
 def addPrompt(data):
     print(data)
     # Reference to the root of your database
-    #NEEDS TO MAKE SURE TITLE DOES NOT EXIST
     ref = db.reference('/')
     jsonfile=json.loads(data)
     ref.child('Prompts').update(jsonfile)
     return f"Saved: {data}"
 
-def removePrompt(username,title):
+def removePrompt(username,title,security_lv):
      # Reference to the 'Prompts' node
     ref = db.reference('/Prompts')
 

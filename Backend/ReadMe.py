@@ -1,5 +1,17 @@
 import json
+#How API keys work
+webkey="xyz"
+userkey="12345abcde"
+apikey=webkey+userkey
+#apikey=xyz12345abcde
+#The key is split into currently 3 parts
+#Part 1 xyz: This just makes sure that there is company access and is a legal key. This key will be added automatically by the website
+#Part 2 12345: This is going to be a unique number based on user. If we have time and are done with everything else, we can add a verificaiton that the user exist.
+#Part 3 abcde: This has 5 versions from abcde, bcdef, ...., This indicates the security level and the filtration of the dataset
 
+#Add this to Settings.py
+default_key="xyz"
+key_levels=["abcde","bcdef","cdefg","defgh","efghi"]
 
 #How to add Prompt to database ##########################################################################################--
 #Variable
@@ -9,9 +21,9 @@ Pprompt="What color is an apple"
 PSLC=-1
 Psecurity=-1
 
-jsonPromptExample={Ptitle: 
-                    {Pusername:{
-                        "Prompt":Pprompt,
+jsonPromptExample={"Ptitle": 
+                    {"Pusername":{
+                        "Prompt":"Pprompt",
                         "models":{  "gemini":
                                     {"model_history":{
                                         "Question_1":["What color is an apple","red"],
@@ -23,14 +35,14 @@ jsonPromptExample={Ptitle:
                                             "Question_2":["What was the first question","What color is an apple"]}
                                         }  
                         },
-                        "SDLC": PSLC,
-                        "Security": Psecurity
+                        "SDLC": "PSLC",
+                        "Security": "Psecurity"
                         }
                     }
                 }
 #Http call
-http=f"http://100.68.81.165:364/api/AddPrompt?api_key=4652424&Data={jsonPromptExample}"
-    
+http=f"http://100.68.81.165:364/api/AddPrompt?api_key={apikey}&Data={jsonPromptExample}"
+
 #How to add Format ##########################################################################################
 Fusername="Daniel Morandi"
 Title="This is a title"
@@ -41,29 +53,29 @@ jsonFormatExample={
                     }
                 }
 #Http call
-http=f"http://100.68.81.165:364/api/AddFormat?api_key=4652424&Data={jsonFormatExample}}}"
+http=f"http://100.68.81.165:364/api/AddFormat?api_key={apikey}&Data={jsonFormatExample}}}"
 
 
 #Rest of https request ##########################################################################################
 #Find all prompts based on security level
 PromptTitle="Apple Test Question"
 Security=1
-http=f"http://100.68.81.165:364/api/FindPrompt?api_key=4652424&Title={PromptTitle}&Security={Security}"
+http=f"http://100.68.81.165:364/api/FindPrompt?api_key={apikey}&Title={PromptTitle}&Security={Security}"
 
 #Find All formats
 FormatTitle="This is a title"
-http=f"http://100.68.81.165:364/api/FindFormat?api_key=4652424&Title={FormatTitle}"
+http=f"http://100.68.81.165:364/api/FindFormat?api_key={apikey}&Title={FormatTitle}"
 
 
 #Remove Prompt Title based on ur own name
 Username="Daniel Morandi"
 Title="Apple Test Question"
-http=f"http://100.68.81.165:364/api/RemovePrompt?api_key=4652424&Username={Username}&Title={Title}"
+http=f"http://100.68.81.165:364/api/RemovePrompt?api_key={apikey}&Username={Username}&Title={Title}"
 
 #Remove Format Title based on ur own name
 Username="Daniel Morandi"
 Title="This is a title"
-http=f"http://100.68.81.165:364/api/RemoveFormat?api_key=4652424&Username={Username}&Title={Title}"
+http=f"http://100.68.81.165:364/api/RemoveFormat?api_key={apikey}&Username={Username}&Title={Title}"
 
 
 #How to Request from model ########################################################################################
@@ -71,13 +83,13 @@ http=f"http://100.68.81.165:364/api/RemoveFormat?api_key=4652424&Username={Usern
 #Without History
 model="gpt"
 prompt="What color is an apple"
-http=f"http://192.168.0.200:364/api/Model?api_key=4652424&Model={model}&Prompt={prompt}"
+http=f"http://192.168.0.200:364/api/Model?api_key={apikey}&Model={model}&Prompt={prompt}"
 
 #With History
 model="gpt"
 prompt="What color is an apple"
 history="{%22Question_1%22:[%22What%20color%20is%20an%20apple%22,%22red%22]}"
-http=f"http://192.168.0.200:364/api/Model?api_key=4652424&Model={model}&Prompt={prompt}&History={history}"
+http=f"http://192.168.0.200:364/api/Model?api_key={apikey}&Model={model}&Prompt={prompt}&History={history}"
 
 
 
