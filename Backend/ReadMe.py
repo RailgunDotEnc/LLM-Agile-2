@@ -23,7 +23,7 @@ Psecurity=-1
 
 jsonPromptExample={"Ptitle": 
                     {"Pusername":{
-                        "Prompt":"Pprompt",
+                        "Prompt":Pprompt,
                         "models":{  "gemini":
                                     {"model_history":{
                                         "Question_1":["What color is an apple","red"],
@@ -35,8 +35,8 @@ jsonPromptExample={"Ptitle":
                                             "Question_2":["What was the first question","What color is an apple"]}
                                         }  
                         },
-                        "SDLC": "PSLC",
-                        "Security": "Psecurity"
+                        "SDLC": PSLC,
+                        "Security": Psecurity                                          
                         }
                     }
                 }
@@ -60,7 +60,7 @@ http=f"http://100.68.81.165:364/api/AddFormat?api_key={apikey}&Data={jsonFormatE
 #Find all prompts based on security level
 PromptTitle="Apple Test Question"
 Security=1
-http=f"http://100.68.81.165:364/api/FindPrompt?api_key={apikey}&Title={PromptTitle}&Security={Security}"
+http=f"http://100.68.81.165:364/api/FindPrompt?api_key={apikey}&Title={PromptTitle}"
 
 #Find All formats
 FormatTitle="This is a title"
