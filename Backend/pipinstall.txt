@@ -15,3 +15,5 @@ pip install transformers
 pip install uvicorn
 
 pip install fastapi
+
+pip install openai
