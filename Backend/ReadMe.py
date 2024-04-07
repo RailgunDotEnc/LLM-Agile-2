@@ -33,7 +33,12 @@ jsonPromptExample={"Ptitle":
                                         {"model_history":{
                                             "Question_1":["What color is an apple","red"],
                                             "Question_2":["What was the first question","What color is an apple"]}
-                                        }  
+                                        },
+                                    "claude" : 
+                                     {"model_history":{
+                                        "Question_1":["What color is an apple","red"],
+                                        "Question_2":["What was the first question","What color is an apple"]}
+                                    }
                         },
                         "SDLC": PSLC,
                         "Security": Psecurity                                          

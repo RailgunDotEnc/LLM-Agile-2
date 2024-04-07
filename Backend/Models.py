@@ -92,7 +92,7 @@ def gemini(prompt,model_history):
     return response.text
 
 def gemini_chat(prompt,model_history):
-    message={"gemini":{}}
+    message={"model":{}}
     new_model_history={"model_history":{}}
     if model_history=="none":
         model_history={}
@@ -108,8 +108,8 @@ def gemini_chat(prompt,model_history):
     response={"response":gemini(prompt, model_history)}
     new_model_history["model_history"].update(model_history)
     new_model_history["model_history"].update({f"Question_{key_num+1}": [prompt,response["response"]]})
-    message["gemini"].update(response)
-    message["gemini"].update(new_model_history)
+    message["model"].update(response)
+    message["model"].update(new_model_history)
     return message
 
 #########################################################################################################
@@ -135,7 +135,7 @@ def gpt(prompt,model_history):
 
 def gpt_chat(prompt,model_history):
     print(model_history)
-    message={"gpt":{}}
+    message={"model":{}}
     new_model_history={"model_history":{}}
     if model_history=="none":
         model_history={}
@@ -151,8 +151,8 @@ def gpt_chat(prompt,model_history):
     response={"response":gpt(prompt, model_history)}
     new_model_history["model_history"].update(model_history)
     new_model_history["model_history"].update({f"Question_{key_num+1}": [prompt,response["response"]]})
-    message["gpt"].update(response)
-    message["gpt"].update(new_model_history)
+    message["model"].update(response)
+    message["model"].update(new_model_history)
     return message
 
 #########################################################################################################
@@ -182,7 +182,7 @@ def claude(prompt,model_history):
 
 def claude_chat(prompt,model_history):
     print(model_history)
-    message={"claude":{}}
+    message={"model":{}}
     new_model_history={"model_history":{}}
     if model_history=="none":
         model_history={}
@@ -198,8 +198,8 @@ def claude_chat(prompt,model_history):
     response={"response":claude(prompt, model_history)}
     new_model_history["model_history"].update(model_history)
     new_model_history["model_history"].update({f"Question_{key_num+1}": [prompt,response["response"]]})
-    message["claude"].update(response)
-    message["claude"].update(new_model_history)
+    message["model"].update(response)
+    message["model"].update(new_model_history)
     return message
 
 #########################################################################################################
