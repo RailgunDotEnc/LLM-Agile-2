@@ -41,7 +41,13 @@ app = FastAPI()
 #KEY FOR SECURITY LEVEL 1
 #KEY FOR SECRUTIY LEVEL 2
 #FRONT_END OWNS KEY
-                                                         
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=False,
+    allow_methods=["GET", "POST", "PUT", "DELETE"],  # Adjust as needed for your API
+    allow_headers=["Authorization", "Content-Type"],  # Adjust as needed for your API
+)                                                         
 
 #
 #Find Prompt
