@@ -21,10 +21,12 @@ Pprompt="What color is an apple"
 PSLC=-1
 Psecurity=-1
 
-jsonPromptExample={"Ptitle": 
-                    {"Pusername":{
-                        "Prompt":Pprompt,
-                        "models":{  "gemini":
+
+jsonPromptExample={"Ptitle":    #Title header
+                    {"Pusername":{ 
+                        "Prompt":Pprompt, 
+                        "models":{  
+                                    "gemini": 
                                     {"model_history":{
                                         "Question_1":["What color is an apple","red"],
                                         "Question_2":["What was the first question","What color is an apple"]}
@@ -45,8 +47,14 @@ jsonPromptExample={"Ptitle":
                         }
                     }
                 }
-#Http call
-http=f"http://100.68.81.165:364/api/AddPrompt?api_key={apikey}&Data={jsonPromptExample}"
+
+#IP Addresses and ports##########################################################################################
+ip="100.68.81.165"
+port="364"
+##########################################################################################
+
+#Http call to add prompt data
+http=f"http://{ip}:{port}/api/AddPrompt?api_key={apikey}&Data={jsonPromptExample}"
 
 #How to add Format ##########################################################################################
 Fusername="Daniel Morandi"
@@ -58,29 +66,29 @@ jsonFormatExample={
                     }
                 }
 #Http call
-http=f"http://100.68.81.165:364/api/AddFormat?api_key={apikey}&Data={jsonFormatExample}}}"
+http=f"http://{ip}:{port}/api/AddFormat?api_key={apikey}&Data={jsonFormatExample}"
 
 
 #Rest of https request ##########################################################################################
 #Find all prompts based on security level
 PromptTitle="Apple Test Question"
 Security=1
-http=f"http://100.68.81.165:364/api/FindPrompt?api_key={apikey}&Title={PromptTitle}"
+http=f"http://{ip}:{port}/api/FindPrompt?api_key={apikey}&Title={PromptTitle}"
 
 #Find All formats
 FormatTitle="This is a title"
-http=f"http://100.68.81.165:364/api/FindFormat?api_key={apikey}&Title={FormatTitle}"
+http=f"http://{ip}:{port}/api/FindFormat?api_key={apikey}&Title={FormatTitle}"
 
 
 #Remove Prompt Title based on ur own name
 Username="Daniel Morandi"
 Title="Apple Test Question"
-http=f"http://100.68.81.165:364/api/RemovePrompt?api_key={apikey}&Username={Username}&Title={Title}"
+http=f"http://{ip}:{port}/api/RemovePrompt?api_key={apikey}&Username={Username}&Title={Title}"
 
 #Remove Format Title based on ur own name
 Username="Daniel Morandi"
 Title="This is a title"
-http=f"http://100.68.81.165:364/api/RemoveFormat?api_key={apikey}&Username={Username}&Title={Title}"
+http=f"http://{ip}:{port}/api/RemoveFormat?api_key={apikey}&Username={Username}&Title={Title}"
 
 
 #How to Request from model ########################################################################################
@@ -88,19 +96,23 @@ http=f"http://100.68.81.165:364/api/RemoveFormat?api_key={apikey}&Username={User
 #Without History
 model="gpt"
 prompt="What color is an apple"
-http=f"http://192.168.0.200:364/api/Model?api_key={apikey}&Model={model}&Prompt={prompt}"
+http=f"http://{ip}:{port}/api/Model?api_key={apikey}&Model={model}&Prompt={prompt}"
 
 #With History
 model="gpt"
 prompt="What color is an apple"
 history="{%22Question_1%22:[%22What%20color%20is%20an%20apple%22,%22red%22]}"
-http=f"http://192.168.0.200:364/api/Model?api_key={apikey}&Model={model}&Prompt={prompt}&History={history}"
+http=f"http://{ip}:{port}/api/Model?api_key={apikey}&Model={model}&Prompt={prompt}&History={history}"
 
 
 
 #Files you need to make for api to work ##########################################################################
 #Settings.py
 #-----------------------------
+#Security
+default_key="xyz"
+key_levels=["abcde","bcdef","cdefg","defgh","efghi"]
+
 #authenticate to firebase
 cred_file=""
 database_url=""
@@ -110,8 +122,10 @@ GOOGLE_API_KEY=""
 OPENAI_API_KEY = ""
 CLUADE_API_KEY = ""
 PRIVATE_GPT_PATH = '/Users/ubadahsaleh/Desktop/Multi-LLM-Agile-Assistant/PrivateGPT'
-#-----------------------------
 
+#Port
+Port="364"
+#----------------------------
 #credentils.json
 #Get from firebase. Ask guidi
 
