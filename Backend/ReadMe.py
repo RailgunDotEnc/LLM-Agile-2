@@ -104,8 +104,18 @@ prompt="What color is an apple"
 history="{%22Question_1%22:[%22What%20color%20is%20an%20apple%22,%22red%22]}"
 http=f"http://{ip}:{port}/api/Model?api_key={apikey}&Model={model}&Prompt={prompt}&History={history}"
 
+#Hot to Request from Jira ##########################################################################################
+#Get these from Jira
+issue_key="FP-1"
+email=""
+api_token=""
 
+http=f"http://{ip}:{port}/api/get_story?api_key={apikey}&issue_key={issue_key}&email={email}&api_token={api_token}"
 
+project_key="FP"
+email=""
+api_token=""
+http=f"http://{ip}:{port}/api/get_story_list?api_key={apikey}&project_key={project_key}&email={email}&api_token={api_token}"
 #Files you need to make for api to work ##########################################################################
 #Settings.py
 #-----------------------------

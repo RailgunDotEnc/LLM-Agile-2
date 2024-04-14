@@ -1,22 +1,16 @@
-import textwrap
-import requests
-from IPython.display import Markdown, display
 import google.generativeai as genai
-from IPython.display import Markdown
-import torch
 import asyncio
 from anthropic import AsyncAnthropic
 from transformers import AutoTokenizer, AutoModelForCausalLM
 import openai
 import json
-from Settings import *
+import Settings as ST
 
-#Key Settup
-#GOOGLE_API_KEY=""
-#OPENAI_API_KEY = ""
-#CLUADE_API_KEY = ""
-#PRIVATE_GPT_PATH = ''
 
+#Set up
+conversation_history = []
+# Initialize OpenAI client
+openai.api_key = ST.OPENAI_API_KEY
 
 def model_manager(Model_name,prompt,model_history):
     if Model_name=="gemini":
@@ -32,21 +26,12 @@ def model_manager(Model_name,prompt,model_history):
     return Result
 
 #########################################################################################################
-
-
-# Global variables
-conversation_history = []
-
-# Initialize OpenAI client
-openai.api_key = OPENAI_API_KEY
-
-#########################################################################################################
+#Helper functions
 
 def get_history(model_history):
     data = json.loads(model_history)
     return data
 
-#########################################################################################################
 
 def add_log(response, prompt, model):
     data = get_history()
@@ -54,6 +39,40 @@ def add_log(response, prompt, model):
     data[model][prompt] = response
 
     return json.dump(data, indent=4) 
+
+def unpack_history(model_history):
+    message={"model":{}}
+    new_model_history={"model_history":{}}
+    if model_history=="none":
+        model_history={}
+        key_num=0
+    else:
+        model_history= json.loads(model_history)
+        max_question_num = -1  # Initialize to a low number
+        for key in model_history.keys():
+            question_num = int(key.split("_")[1])  # Extract the question number
+            if question_num > max_question_num:
+                max_question_num = question_num
+        key_num=max_question_num
+    return message,new_model_history,key_num,model_history
+
+def prompt_reformatting(model_history,prompt):
+    if len(model_history)!=0:
+        new_prompt="Past Converstation: \n"
+    else:
+        new_prompt=""
+    for key in model_history.keys():
+        new_prompt=f"{new_prompt}User Question: {model_history[key][0]}\n"
+        new_prompt=f"{new_prompt}Your Response: {model_history[key][1]}\n"
+    new_prompt=f"{new_prompt}\nAnswer the following: {prompt}"
+    return new_prompt
+
+def repack_history(new_model_history,model_history,key_num,prompt,response,message):
+    new_model_history["model_history"].update(model_history)
+    new_model_history["model_history"].update({f"Question_{key_num+1}": [prompt,response["response"]]})
+    message["model"].update(response)
+    message["model"].update(new_model_history)
+    return message
 
 #########################################################################################################
 
@@ -77,53 +96,24 @@ def add_log(response, prompt, model):
 #########################################################################################################
 
 def gemini(prompt,model_history):
-    genai.configure(api_key=GOOGLE_API_KEY)
+    genai.configure(api_key=ST.GOOGLE_API_KEY)
     model = genai.GenerativeModel('gemini-pro')
-    if len(model_history)!=0:
-        new_prompt="Past Converstation: \n"
-    else:
-        new_prompt=""
-    for key in model_history.keys():
-        new_prompt=f"{new_prompt}User Question: {model_history[key][0]}\n"
-        new_prompt=f"{new_prompt}Your Response: {model_history[key][1]}\n"
-    new_prompt=f"{new_prompt}\nAnswer the following: {prompt}"
+    new_prompt=prompt_reformatting(model_history,prompt)
     response = model.generate_content(new_prompt)
     #model_history = json.dumps(get_history(model_history)) + prompt+response
     return response.text
 
 def gemini_chat(prompt,model_history):
-    message={"model":{}}
-    new_model_history={"model_history":{}}
-    if model_history=="none":
-        model_history={}
-        key_num=0
-    else:
-        model_history= json.loads(model_history)
-        max_question_num = -1  # Initialize to a low number
-        for key in model_history.keys():
-            question_num = int(key.split("_")[1])  # Extract the question number
-            if question_num > max_question_num:
-                max_question_num = question_num
-        key_num=max_question_num
+    message,new_model_history,key_num,model_history=unpack_history(model_history)
     response={"response":gemini(prompt, model_history)}
-    new_model_history["model_history"].update(model_history)
-    new_model_history["model_history"].update({f"Question_{key_num+1}": [prompt,response["response"]]})
-    message["model"].update(response)
-    message["model"].update(new_model_history)
+    message=repack_history(new_model_history,model_history,key_num,prompt,response,message)
     return message
 
 #########################################################################################################
 
 def gpt(prompt,model_history):
     # Concatenate prompts and previous responses for context
-    if len(model_history)!=0:
-        new_prompt="Past Converstation: \n"
-    else:
-        new_prompt=""
-    for key in model_history.keys():
-        new_prompt=f"{new_prompt}User Question: {model_history[key][0]}\n"
-        new_prompt=f"{new_prompt}Your Response: {model_history[key][1]}\n"
-    new_prompt=f"{new_prompt}\nAnswer the following: {prompt}"
+    new_prompt=prompt_reformatting(model_history,prompt)
     print(new_prompt)
     # Generate response using the OpenAI API
     response = openai.Completion.create(
@@ -134,32 +124,16 @@ def gpt(prompt,model_history):
     return response["choices"][0]["text"].strip()
 
 def gpt_chat(prompt,model_history):
-    print(model_history)
-    message={"model":{}}
-    new_model_history={"model_history":{}}
-    if model_history=="none":
-        model_history={}
-        key_num=0
-    else:
-        model_history= json.loads(model_history)
-        max_question_num = -1  # Initialize to a low number
-        for key in model_history.keys():
-            question_num = int(key.split("_")[1])  # Extract the question number
-            if question_num > max_question_num:
-                max_question_num = question_num
-        key_num=max_question_num
+    message,new_model_history,key_num,model_history=unpack_history(model_history)
     response={"response":gpt(prompt, model_history)}
-    new_model_history["model_history"].update(model_history)
-    new_model_history["model_history"].update({f"Question_{key_num+1}": [prompt,response["response"]]})
-    message["model"].update(response)
-    message["model"].update(new_model_history)
+    message=repack_history(new_model_history,model_history,key_num,prompt,response,message)
     return message
 
 #########################################################################################################
 
 anthropic = AsyncAnthropic()
 async def run_claude(prompt,model_history):
-    anthropic = AsyncAnthropic(api_key=CLUADE_API_KEY)
+    anthropic = AsyncAnthropic(api_key=ST.CLUADE_API_KEY)
     completion = await anthropic.completions.create(
         model="claude-2.1",
         max_tokens_to_sample=300,
@@ -169,37 +143,13 @@ async def run_claude(prompt,model_history):
 
 # Helper Function for Async
 def claude(prompt,model_history):
-    if len(model_history)!=0:
-        new_prompt="Past Converstation: \n"
-    else:
-        new_prompt=""
-    for key in model_history.keys():
-        new_prompt=f"{new_prompt}User Question: {model_history[key][0]}\n"
-        new_prompt=f"{new_prompt}Your Response: {model_history[key][1]}\n"
-    new_prompt=f"{new_prompt}\nAnswer the following: {prompt}"
-    print(new_prompt)
+    new_prompt=prompt_reformatting(model_history,prompt)
     return asyncio.run(run_claude(new_prompt))
 
 def claude_chat(prompt,model_history):
-    print(model_history)
-    message={"model":{}}
-    new_model_history={"model_history":{}}
-    if model_history=="none":
-        model_history={}
-        key_num=0
-    else:
-        model_history= json.loads(model_history)
-        max_question_num = -1  # Initialize to a low number
-        for key in model_history.keys():
-            question_num = int(key.split("_")[1])  # Extract the question number
-            if question_num > max_question_num:
-                max_question_num = question_num
-        key_num=max_question_num
+    message,new_model_history,key_num,model_history=unpack_history(model_history)
     response={"response":claude(prompt, model_history)}
-    new_model_history["model_history"].update(model_history)
-    new_model_history["model_history"].update({f"Question_{key_num+1}": [prompt,response["response"]]})
-    message["model"].update(response)
-    message["model"].update(new_model_history)
+    message=repack_history(new_model_history,model_history,key_num,prompt,response,message)
     return message
 
 #########################################################################################################

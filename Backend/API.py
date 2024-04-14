@@ -1,20 +1,31 @@
+#Import from other files
 import FireDB as DB
 import Models as MD
+import Settings as ST
+import Jira as JI
+
+#Import from Settigns
 import uvicorn
 from fastapi import FastAPI,  Request
 from fastapi.middleware.cors import CORSMiddleware
 import socket
-import Settings as ST
-#Test functions
-#addPrompt("NewPromptName",new_prompt['NewPromptName']['Description'],new_prompt['NewPromptName']['Role'],new_prompt['NewPromptName']['SdlcPhase'])
-#removePrompt("NewPromptName")
+
+#Setting up variables
 origins = [
     "http://localhost:3000/",  # Adjust this to the domain of your frontend application
     # Add other allowed origins as needed
 ]
+app = FastAPI()
 
-#addFormat("NewFormatName",new_format['NewFormatName']['Description'])
-#removeFormat("NewFormatName")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=False,
+    allow_methods=["GET", "POST", "PUT", "DELETE"],  # Adjust as needed for your API
+    allow_headers=["Authorization", "Content-Type"],  # Adjust as needed for your API
+)       
+
+
 #API Key Manager
 #Example key: xyz12345abcde
 def check_Key(key):
@@ -35,26 +46,14 @@ def check_Key(key):
     else:
         return -1
     
-        
+                                                  
 
-app = FastAPI()
-#KEY FOR SECURITY LEVEL 1
-#KEY FOR SECRUTIY LEVEL 2
-#FRONT_END OWNS KEY
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=False,
-    allow_methods=["GET", "POST", "PUT", "DELETE"],  # Adjust as needed for your API
-    allow_headers=["Authorization", "Content-Type"],  # Adjust as needed for your API
-)                                                         
-
-#
-#Find Prompt
-#NEEDS SECURITY LEVEL CHECK
-#REPLACE API KEY WITH SECURITY LEVEL
+##############################################################################################################################################################################################################################################
+#Test ping
 @app.get("/")
-async def ping(request: Request, api_key: str):
+async def ping(request: Request, api_key: str= "none"):
+    if api_key=="none":
+        return {"ping":"No api key used"}
     level=check_Key(api_key)
     if level==-2:
         message="Access not allowed"
@@ -70,8 +69,10 @@ async def ping(request: Request, api_key: str):
         message="LV 4: access"
     elif level==5:
         message="LV 5: access"
-    return {"message":message}
+    return {"ping":message}
 
+##############################################################################################################################################################################################################################################
+#Firebase calls
 @app.get("/api/FindPrompt")
 async def bard_call(request: Request,api_key: str, Title: str):
     if check_Key(api_key)!=-2:
@@ -119,7 +120,9 @@ async def bard_call(request: Request,api_key: str,Username:str, Title: str):
         return {"status":message} 
     else:
         return {"message":"Acess Error"}  
-    
+
+##############################################################################################################################################################################################################################################
+#LLM calls
 @app.get("/api/Model")
 async def bard_call(request: Request,api_key: str,Model:str, Prompt: str, History:str= "none"):
     if check_Key(api_key)!=-2:
@@ -128,7 +131,29 @@ async def bard_call(request: Request,api_key: str,Model:str, Prompt: str, Histor
     else:
         return {"Error":"Acess Error"}  
 
+##############################################################################################################################################################################################################################################
+#Jira calls
+@app.get("/api/get_story")
+async def bard_call(request: Request,api_key: str,issue_key:str,email:str, api_token:str):
+    if check_Key(api_key)!=-2:
+        #Adding Jira class
+        jira_api = JI.JiraAPI(email, api_token, ST.jira_domain)
+        message=str(jira_api.get_story(issue_key))
+        return {"jira":message}
+    else:
+        return {"Error":"Acess Error"}  
 
+@app.get("/api/get_story_list")
+async def bard_call(request: Request,api_key: str,project_key:str,email:str, api_token:str):
+    if check_Key(api_key)!=-2:
+        jira_api = JI.JiraAPI(email, api_token, ST.jira_domain)
+        message=jira_api.get_story_list(project_key)
+        return {"jira":message}
+    else:
+        return {"Error":"Acess Error"}  
+
+##############################################################################################################################################################################################################################################
+# Program start
 if __name__ == '__main__':
     host_name = socket.gethostname()
     IP_address=socket.gethostbyname(host_name)
