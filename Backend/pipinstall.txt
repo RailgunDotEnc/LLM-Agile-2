@@ -19,3 +19,5 @@ pip install fastapi
 pip install openai
 
 pip install jsons
+
+pip install pgpt_python

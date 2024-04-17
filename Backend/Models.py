@@ -5,7 +5,7 @@ from transformers import AutoTokenizer, AutoModelForCausalLM
 import openai
 import json
 import Settings as ST
-
+from pgpt_python.client import PrivateGPTApi
 
 #Set up
 conversation_history = []
@@ -20,7 +20,7 @@ def model_manager(Model_name,prompt,model_history):
     elif Model_name=="claude":
         Result=claude_chat(prompt, model_history)
     elif Model_name=="llama":
-        Result=LLAMA(prompt, model_history)
+        Result=LLAMA_chat(prompt, model_history)
     else:
         Result={"Error":"Model not found"}
     return Result
@@ -73,27 +73,7 @@ def repack_history(new_model_history,model_history,key_num,prompt,response,messa
     message["model"].update(response)
     message["model"].update(new_model_history)
     return message
-
-#########################################################################################################
-
-# Load the tokenizer and model
-#tokenizer = AutoTokenizer.from_pretrained(PRIVATE_GPT_PATH)
-#model = AutoModelForCausalLM.from_pretrained(PRIVATE_GPT_PATH)
-
-#def private_gpt(prompt, max_length=50):
-    # Tokenize the input prompt
-#    input_ids = tokenizer.encode(prompt, return_tensors='pt')
-    
-    # Generate a sequence of tokens following the prompt
-#    output = model.generate(input_ids, max_length=max_length, num_return_sequences=1)
-
-    # Decode the output tokens to a string
-#    text = tokenizer.decode(output[0], skip_special_tokens=True)
-
-    # Display the text
-#   display(Markdown(textwrap.indent(text, '> ')))
-
-#########################################################################################################
+##########################################################################################################
 
 def gemini(prompt,model_history):
     genai.configure(api_key=ST.GOOGLE_API_KEY)
@@ -154,31 +134,35 @@ def claude_chat(prompt,model_history):
 
 #########################################################################################################
 
-#https://huggingface.co/CohereForAI/c4ai-command-r-v01
-def LLAMA(prompt):
-    model_id = "CohereForAI/c4ai-command-r-v01"
-    tokenizer = AutoTokenizer.from_pretrained(model_id, trust_remote_code=True)
-    model = AutoModelForCausalLM.from_pretrained(model_id, trust_remote_code=True)
+def LLAMA(genText, context):
+    # Answer Prompt
+    client = PrivateGPTApi(base_url="http://localhost:8001")
 
-    # Format message with the command-r chat template
-    messages = [{"role": "user", "content": (json.dumps(get_history())+prompt)}]
-    input_ids = tokenizer.apply_chat_template(messages, tokenize=True, add_generation_prompt=True, return_tensors="pt")
-    ## <BOS_TOKEN><|START_OF_TURN_TOKEN|><|USER_TOKEN|>prompt<|END_OF_TURN_TOKEN|><|START_OF_TURN_TOKEN|><|CHATBOT_TOKEN|>
+    prompt_result = client.contextual_completions.prompt_completion(
+        prompt = genText,
+        use_context=context,
+        include_sources=context,
+    )
 
-    gen_tokens = model.generate(
-        input_ids, 
-        max_new_tokens=100, 
-        do_sample=True, 
-        temperature=0.3,
-        )
+    # print(prompt_result.choices[0].message.content) # Debug print out result
 
-    gen_text = tokenizer.decode(gen_tokens[0])
+    gen_text = prompt_result.choices[0].message.content
     return gen_text
 
-def LLAMA_chat(prompt):
-    response = LLAMA(prompt)
-    add_log(response, prompt, model="LLAMA")
+def LLAMA_chat(prompt, context):
+    response = LLAMA(prompt, context)
+    #add_log(response, prompt, model="LLAMA")
     return response
+
+def LLAMA_ingest_text(inText, tname):
+    client = PrivateGPTApi(base_url="http://localhost:8001")
+    text_to_ingest = inText
+
+    ingested_text_doc_id = (
+        client.ingestion.ingest_text(file_name=tname, text=text_to_ingest)
+        .data[0]
+        .doc_id
+    )
 
 #########################################################################################################
 

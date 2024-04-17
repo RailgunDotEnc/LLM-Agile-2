@@ -24,7 +24,7 @@ Psecurity=-1
 
 jsonPromptExample={"Ptitle":    #Title header
                     {"Pusername":{ 
-                        "Prompt":Pprompt, 
+                        "Prompt":"What color is an apple", 
                         "models":{  
                                     "gemini": 
                                     {"model_history":{
