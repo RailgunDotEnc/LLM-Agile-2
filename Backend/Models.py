@@ -1,17 +1,16 @@
 import google.generativeai as genai
-import asyncio
-from anthropic import AsyncAnthropic
+import anthropic
 from transformers import AutoTokenizer, AutoModelForCausalLM
-import openai
+from openai import OpenAI
 import json
 import Settings as ST
+import openai 
 from pgpt_python.client import PrivateGPTApi
 
 #Set up
 conversation_history = []
 # Initialize OpenAI client
-openai.api_key = ST.OPENAI_API_KEY
-
+client = OpenAI(api_key = ST.OPENAI_API_KEY)
 def model_manager(Model_name,prompt,model_history):
     if Model_name=="gemini":
         Result=gemini_chat(prompt,model_history)
@@ -91,40 +90,40 @@ def gemini_chat(prompt,model_history):
 
 #########################################################################################################
 
-def gpt(prompt,model_history):
+def gpt(prompt, model_history):
     # Concatenate prompts and previous responses for context
-    new_prompt=prompt_reformatting(model_history,prompt)
-    print(new_prompt)
-    # Generate response using the OpenAI API
-    response = openai.Completion.create(
-        model="gpt-3.5-turbo-instruct",  
-        prompt=new_prompt,
-        max_tokens=150
+    new_prompt = prompt_reformatting(model_history, prompt)
+    system = [{"role": "system", "content": "You are HappyBot."}]
+    user = [{"role": "user", "content": new_prompt}]
+    chat_completion = client.chat.completions.create(
+    messages = system + user,
+    model="gpt-3.5-turbo",
+    max_tokens=25, top_p=0.9,
     )
-    return response["choices"][0]["text"].strip()
+    
+    return chat_completion.choices[0].message.content
 
-def gpt_chat(prompt,model_history):
-    message,new_model_history,key_num,model_history=unpack_history(model_history)
-    response={"response":gpt(prompt, model_history)}
-    message=repack_history(new_model_history,model_history,key_num,prompt,response,message)
+def gpt_chat(prompt, model_history):
+    message, new_model_history, key_num, model_history = unpack_history(model_history)
+    response = {"response": gpt(prompt, model_history)}
+    message = repack_history(new_model_history, model_history, key_num, prompt, response, message)
     return message
 
 #########################################################################################################
 
-anthropic = AsyncAnthropic()
-async def run_claude(prompt,model_history):
-    anthropic = AsyncAnthropic(api_key=ST.CLUADE_API_KEY)
-    completion = await anthropic.completions.create(
-        model="claude-2.1",
-        max_tokens_to_sample=300,
-        prompt=prompt,
-    )
-    return completion.completion+"\n"
 
-# Helper Function for Async
+# Helper Function
 def claude(prompt,model_history):
     new_prompt=prompt_reformatting(model_history,prompt)
-    return asyncio.run(run_claude(new_prompt))
+    client  = anthropic.Anthropic(api_key=ST.CLUADE_API_KEY)
+    message = client.messages.create(
+    model="claude-3-opus-20240229",
+    max_tokens=1024,
+    messages=[
+        {"role": "user", "content": new_prompt}
+    ]
+)
+    return message.content
 
 def claude_chat(prompt,model_history):
     message,new_model_history,key_num,model_history=unpack_history(model_history)

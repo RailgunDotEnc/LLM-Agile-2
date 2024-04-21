@@ -158,4 +158,4 @@ if __name__ == '__main__':
     host_name = socket.gethostname()
     IP_address=socket.gethostbyname(host_name)
     print("Using IP:", IP_address)
-    uvicorn.run("API:app", host=IP_address, port=364, workers=4) 
+    uvicorn.run("API:app", host=IP_address, port=ST.Port, workers=4) 
