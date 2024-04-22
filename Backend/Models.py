@@ -5,7 +5,7 @@ from openai import OpenAI
 import json
 import Settings as ST
 import openai 
-from pgpt_python.client import PrivateGPTApi
+#from pgpt_python.client import PrivateGPTApi
 
 #Set up
 conversation_history = []
@@ -123,7 +123,7 @@ def claude(prompt,model_history):
         {"role": "user", "content": new_prompt}
     ]
 )
-    return message.content
+    return f"{message.content}"
 
 def claude_chat(prompt,model_history):
     message,new_model_history,key_num,model_history=unpack_history(model_history)
@@ -133,25 +133,26 @@ def claude_chat(prompt,model_history):
 
 #########################################################################################################
 
-def LLAMA(genText, context):
+
+def LLAMA(prompt,model_history, context):
+    new_prompt=prompt_reformatting(model_history,prompt)
     # Answer Prompt
     client = PrivateGPTApi(base_url="http://localhost:8001")
 
     prompt_result = client.contextual_completions.prompt_completion(
-        prompt = genText,
+        prompt = new_prompt,
         use_context=context,
         include_sources=context,
     )
 
     # print(prompt_result.choices[0].message.content) # Debug print out result
+    return prompt_result.choices[0].message.content
 
-    gen_text = prompt_result.choices[0].message.content
-    return gen_text
-
-def LLAMA_chat(prompt, context):
-    response = LLAMA(prompt, context)
-    #add_log(response, prompt, model="LLAMA")
-    return response
+def LLAMA_chat(prompt,model_history):
+    message,new_model_history,key_num,model_history=unpack_history(model_history)
+    response = {"response":LLAMA(prompt,model_history, ST.context)}
+    message=repack_history(new_model_history,model_history,key_num,prompt,response,message)
+    return message
 
 def LLAMA_ingest_text(inText, tname):
     client = PrivateGPTApi(base_url="http://localhost:8001")

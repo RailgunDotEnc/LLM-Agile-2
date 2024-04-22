@@ -12,17 +12,17 @@ import socket
 
 #Setting up variables
 origins = [
-    "http://localhost:3000/",  # Adjust this to the domain of your frontend application
+    "http://*",  # Adjust this to the domain of your frontend application
     # Add other allowed origins as needed
 ]
 app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=False,
-    allow_methods=["GET", "POST", "PUT", "DELETE"],  # Adjust as needed for your API
-    allow_headers=["Authorization", "Content-Type"],  # Adjust as needed for your API
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],  # Adjust as needed for your API
+    allow_headers=["*"],  # Adjust as needed for your API
 )       
 
 
@@ -158,4 +158,4 @@ if __name__ == '__main__':
     host_name = socket.gethostname()
     IP_address=socket.gethostbyname(host_name)
     print("Using IP:", IP_address)
-    uvicorn.run("API:app", host=IP_address, port=ST.Port, workers=4) 
+    uvicorn.run("API:app", host=IP_address, port=364, workers=4) 

@@ -42,8 +42,8 @@ jsonPromptExample={"Ptitle":    #Title header
                                         "Question_2":["What was the first question","What color is an apple"]}
                                     }
                         },
-                        "SDLC": PSLC,
-                        "Security": Psecurity                                          
+                        "SDLC": "PSLC",
+                        "Security": "Psecurity"                                          
                         }
                     }
                 }
