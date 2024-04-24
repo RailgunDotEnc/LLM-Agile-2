@@ -30,6 +30,13 @@ def construct_json(Title, Prompt, Role, SdlcPhase, History):
 
 
 #Database calls
+def getAllPrompts():
+    ref = db.reference('/Prompts')
+    print(ref)
+        # Query to find the object with the title 'NewPromptName'
+    query = ref.get().keys()
+    return {"keys":list(query)}
+
 def findPrompt(title,security_lv):
     print(title)
     ref = db.reference('/Prompts')
@@ -38,6 +45,13 @@ def findPrompt(title,security_lv):
     result = query.get()
     result_filtered=filter_users(result,security_lv)
     return result_filtered
+
+def getAllFormats():
+    ref = db.reference('/Formats')
+    print(ref)
+        # Query to find the object with the title 'NewPromptName'
+    query = ref.get().keys()
+    return {"keys":list(query)}
 
 def findFormat(title):
     ref = db.reference('/Formats')

@@ -71,12 +71,16 @@ http=f"http://{ip}:{port}/api/AddFormat?api_key={apikey}&Data={jsonFormatExample
 
 
 #Rest of https request ##########################################################################################
-#Find all prompts based on security level
+#Find all prompts: only returns titles
+http=f"http://{ip}:{port}/api/ScanAllPrompts?api_key={apikey}"
+#Find all formats: only returns titles
+http=f"http://{ip}:{port}/api/ScanAllFormats?api_key={apikey}"
+
+#Find all prompts for title based on security level
 PromptTitle="Apple Test Question"
-Security=1
 http=f"http://{ip}:{port}/api/FindPrompt?api_key={apikey}&Title={PromptTitle}"
 
-#Find All formats
+#Find All formats for title
 FormatTitle="This is a title"
 http=f"http://{ip}:{port}/api/FindFormat?api_key={apikey}&Title={FormatTitle}"
 

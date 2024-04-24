@@ -73,7 +73,22 @@ async def ping(request: Request, api_key: str= "none"):
 
 ##############################################################################################################################################################################################################################################
 #Firebase calls
-@app.get("/api/FindPrompt")
+@app.get("/api/ScanAllPrompts")
+async def bard_call(request: Request,api_key: str):
+    if check_Key(api_key)!=-2:
+        message=DB.getAllPrompts()
+        return message
+    else:
+        return {"message":"Acess Error"}
+    
+@app.get("/api/ScanAllFormats")
+async def bard_call(request: Request,api_key: str):
+    if check_Key(api_key)!=-2:
+        message=message=DB.getAllFormats()
+        return message
+    else:
+        return {"message":"Acess Error"}
+    
 async def bard_call(request: Request,api_key: str, Title: str):
     if check_Key(api_key)!=-2:
         message=DB.findPrompt(Title,check_Key(api_key))
@@ -84,7 +99,7 @@ async def bard_call(request: Request,api_key: str, Title: str):
 @app.get("/api/FindFormat")
 async def bard_call(request: Request,api_key: str, Title: str):
     if check_Key(api_key)!=-2:
-        message=DB.findFormat(Title,check_Key(api_key))
+        message=DB.findFormat(Title)
         return message
     else:
         return {"message":"Acess Error"}
