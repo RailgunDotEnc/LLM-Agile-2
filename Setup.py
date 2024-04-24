@@ -43,6 +43,6 @@ setup(
         'Programming Language :: Python :: 3.11',
     ],
     install_requires=required_packages,
-    python_requires='>=3.11',
+    python_requires='>=3.12',
     
 )
