@@ -149,7 +149,7 @@ async def bard_call(request: Request,api_key: str,Model:str, Prompt: str, Histor
 
 ##############################################################################################################################################################################################################################################
 #Jira calls
-@app.get("/api/get_story")
+@app.get("/api/get_story/jira1")
 async def bard_call(request: Request,api_key: str,issue_key:str,email:str, api_token:str):
     if check_Key(api_key)!=-2:
         #Adding Jira class
@@ -167,6 +167,7 @@ async def bard_call(request: Request,api_key: str,project_key:str,email:str, api
         return {"jira":message}
     else:
         return {"Error":"Acess Error"}  
+    
 
 ##############################################################################################################################################################################################################################################
 # Program start

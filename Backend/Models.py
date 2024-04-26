@@ -5,7 +5,7 @@ from openai import OpenAI
 import json
 import Settings as ST
 import openai 
-#from pgpt_python.client import PrivateGPTApi
+from pgpt_python.client import PrivateGPTApi
 
 #Set up
 conversation_history = []
@@ -75,9 +75,10 @@ def repack_history(new_model_history,model_history,key_num,prompt,response,messa
 ##########################################################################################################
 
 def gemini(prompt,model_history):
+    new_prompt=prompt_reformatting(model_history,prompt)
+
     genai.configure(api_key=ST.GOOGLE_API_KEY)
     model = genai.GenerativeModel('gemini-pro')
-    new_prompt=prompt_reformatting(model_history,prompt)
     response = model.generate_content(new_prompt)
     #model_history = json.dumps(get_history(model_history)) + prompt+response
     return response.text
@@ -93,6 +94,7 @@ def gemini_chat(prompt,model_history):
 def gpt(prompt, model_history):
     # Concatenate prompts and previous responses for context
     new_prompt = prompt_reformatting(model_history, prompt)
+
     system = [{"role": "system", "content": "You are HappyBot."}]
     user = [{"role": "user", "content": new_prompt}]
     chat_completion = client.chat.completions.create(
@@ -115,6 +117,7 @@ def gpt_chat(prompt, model_history):
 # Helper Function
 def claude(prompt,model_history):
     new_prompt=prompt_reformatting(model_history,prompt)
+    
     client  = anthropic.Anthropic(api_key=ST.CLUADE_API_KEY)
     message = client.messages.create(
     model="claude-3-opus-20240229",
@@ -123,7 +126,7 @@ def claude(prompt,model_history):
         {"role": "user", "content": new_prompt}
     ]
 )
-    return f"{message.content}"
+    return f"{message.content[0].text}"
 
 def claude_chat(prompt,model_history):
     message,new_model_history,key_num,model_history=unpack_history(model_history)
