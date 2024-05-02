@@ -7,9 +7,8 @@ import Settings as ST
 import openai 
 from pgpt_python.client import PrivateGPTApi
 
-#Set up
-conversation_history = []
-# Initialize OpenAI client
+
+#Call from API
 client = OpenAI(api_key = ST.OPENAI_API_KEY)
 def model_manager(Model_name,prompt,model_history):
     if Model_name=="gemini":
@@ -73,41 +72,49 @@ def repack_history(new_model_history,model_history,key_num,prompt,response,messa
     message["model"].update(new_model_history)
     return message
 ##########################################################################################################
-
-def gemini(prompt,model_history):
-    new_prompt=prompt_reformatting(model_history,prompt)
-
+#Gemini Model code
+def gemini(prompt):
+    #Prompt comes in as string
     genai.configure(api_key=ST.GOOGLE_API_KEY)
     model = genai.GenerativeModel('gemini-pro')
-    response = model.generate_content(new_prompt)
-    #model_history = json.dumps(get_history(model_history)) + prompt+response
+    response = model.generate_content(prompt)
+    #Return string
     return response.text
 
+#Formatting prompts for Gemini
 def gemini_chat(prompt,model_history):
+    #Unpacking history form API for set blank if empty
     message,new_model_history,key_num,model_history=unpack_history(model_history)
-    response={"response":gemini(prompt, model_history)}
+    #Reformat prompt with prompt history
+    new_prompt=prompt_reformatting(model_history,prompt)
+    #Request from Gemini
+    response={"response":gemini(new_prompt)}
+    #Reformat response to send back
     message=repack_history(new_model_history,model_history,key_num,prompt,response,message)
     return message
 
 #########################################################################################################
-
-def gpt(prompt, model_history):
-    # Concatenate prompts and previous responses for context
-    new_prompt = prompt_reformatting(model_history, prompt)
-
+#gpt Model code
+def gpt(prompt):
+    #Prompt comes in as string
     system = [{"role": "system", "content": "You are HappyBot."}]
-    user = [{"role": "user", "content": new_prompt}]
+    user = [{"role": "user", "content": prompt}]
     chat_completion = client.chat.completions.create(
     messages = system + user,
     model="gpt-3.5-turbo",
     max_tokens=25, top_p=0.9,
     )
-    
+    #Return string
     return chat_completion.choices[0].message.content
 
 def gpt_chat(prompt, model_history):
+    #Unpacking history form API for set blank if empty
     message, new_model_history, key_num, model_history = unpack_history(model_history)
-    response = {"response": gpt(prompt, model_history)}
+    #Reformat prompt with prompt history
+    new_prompt = prompt_reformatting(model_history, prompt)
+    #Request from Gpt
+    response = {"response": gpt(new_prompt)}
+    #Reformat response to send back
     message = repack_history(new_model_history, model_history, key_num, prompt, response, message)
     return message
 
@@ -115,48 +122,58 @@ def gpt_chat(prompt, model_history):
 
 
 # Helper Function
-def claude(prompt,model_history):
-    new_prompt=prompt_reformatting(model_history,prompt)
-    
+def claude(prompt):
+    #Prompt comes in as string
     client  = anthropic.Anthropic(api_key=ST.CLUADE_API_KEY)
     message = client.messages.create(
     model="claude-3-opus-20240229",
     max_tokens=1024,
     messages=[
-        {"role": "user", "content": new_prompt}
+        {"role": "user", "content": prompt}
     ]
 )
+    #Return string
     return f"{message.content[0].text}"
 
 def claude_chat(prompt,model_history):
+    #Unpacking history form API for set blank if empty
     message,new_model_history,key_num,model_history=unpack_history(model_history)
-    response={"response":claude(prompt, model_history)}
+    #Reformat prompt with prompt history
+    new_prompt=prompt_reformatting(model_history,prompt)
+    #Request from Claude
+    response={"response":claude(new_prompt)}
+    #Reformat response to send back
     message=repack_history(new_model_history,model_history,key_num,prompt,response,message)
     return message
 
 #########################################################################################################
 
 
-def LLAMA(prompt,model_history, context):
-    new_prompt=prompt_reformatting(model_history,prompt)
-    # Answer Prompt
+#Calls to Private GPT
+def LLAMA(prompt, context):
+    #Prompt comes in as string
     client = PrivateGPTApi(base_url="http://localhost:8001")
-
     prompt_result = client.contextual_completions.prompt_completion(
-        prompt = new_prompt,
+        prompt = prompt,
         use_context=context,
         include_sources=context,
     )
-
-    # print(prompt_result.choices[0].message.content) # Debug print out result
+    #Return string
     return prompt_result.choices[0].message.content
 
+#LLAMA formatting  
 def LLAMA_chat(prompt,model_history):
+    #Unpacking history form API for set blank if empty
     message,new_model_history,key_num,model_history=unpack_history(model_history)
-    response = {"response":LLAMA(prompt,model_history, ST.context)}
+    #Reformat prompt with prompt history
+    new_prompt=prompt_reformatting(model_history,prompt)
+    #Request from LLAMA
+    response = {"response":LLAMA(new_prompt, ST.context)}
+    #Reformat response to send back
     message=repack_history(new_model_history,model_history,key_num,prompt,response,message)
     return message
 
+#Feature to add files to LLama documents
 def LLAMA_ingest_text(inText, tname):
     client = PrivateGPTApi(base_url="http://localhost:8001")
     text_to_ingest = inText

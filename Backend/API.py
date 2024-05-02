@@ -10,6 +10,7 @@ from fastapi import FastAPI,  Request
 from fastapi.middleware.cors import CORSMiddleware
 import socket
 
+#Front end needed middleware
 #Setting up variables
 origins = [
     "http://*",  # Adjust this to the domain of your frontend application
@@ -73,6 +74,7 @@ async def ping(request: Request, api_key: str= "none"):
 
 ##############################################################################################################################################################################################################################################
 #Firebase calls
+#Gets all prompts from Firebase
 @app.get("/api/ScanAllPrompts")
 async def bard_call(request: Request,api_key: str):
     if check_Key(api_key)!=-2:
@@ -80,7 +82,8 @@ async def bard_call(request: Request,api_key: str):
         return message
     else:
         return {"message":"Acess Error"}
-    
+
+#Gets all formats from Firebase
 @app.get("/api/ScanAllFormats")
 async def bard_call(request: Request,api_key: str):
     if check_Key(api_key)!=-2:
@@ -88,7 +91,8 @@ async def bard_call(request: Request,api_key: str):
         return message
     else:
         return {"message":"Acess Error"}
-    
+
+#Find prompt with title
 @app.get("/api/FindPrompt")
 async def bard_call(request: Request,api_key: str, Title: str):
     if check_Key(api_key)!=-2:
@@ -97,6 +101,7 @@ async def bard_call(request: Request,api_key: str, Title: str):
     else:
         return {"message":"Acess Error"}
 
+#Find format with title
 @app.get("/api/FindFormat")
 async def bard_call(request: Request,api_key: str, Title: str):
     if check_Key(api_key)!=-2:
@@ -104,7 +109,8 @@ async def bard_call(request: Request,api_key: str, Title: str):
         return message
     else:
         return {"message":"Acess Error"}
-    
+
+#Add prompt using json
 @app.get("/api/AddPrompt")###########
 async def bard_call(request: Request,api_key: str, Data:str):
     if check_Key(api_key)!=-2:
@@ -113,6 +119,7 @@ async def bard_call(request: Request,api_key: str, Data:str):
     else:
         return {"message":"Acess Error"}
 
+#Add format using json
 @app.get("/api/AddFormat")###############
 async def bard_call(request: Request,api_key: str, Data: str):
     if check_Key(api_key)!=-2:
@@ -121,14 +128,17 @@ async def bard_call(request: Request,api_key: str, Data: str):
     else:
         return {"message":"Acess Error"}
     
+#Remove prompt using title
 @app.get("/api/RemovePrompt")
+#only removes if username matches
 async def bard_call(request: Request,api_key: str,Username:str, Title: str):
     if check_Key(api_key)!=-2:
         message=DB.removePrompt(Username, Title,check_Key(api_key))
         return {"status":message} 
     else:
-        return {"message":"Acess Error"}   
-
+        return {"message":"Acess Error"}  
+     
+#Remove format using title
 @app.get("/api/RemoveFormat")
 async def bard_call(request: Request,api_key: str,Username:str, Title: str):
     if check_Key(api_key)!=-2:
