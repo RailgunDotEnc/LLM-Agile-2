@@ -49,9 +49,13 @@ jsonPromptExample={"Ptitle":    #Title header
                 }
 
 #IP Addresses and ports##########################################################################################
-#http://66.253.176.66:364/
-ip="66.253.176.66:364"
-port="364"
+ip="70.153.136.26"
+port="333"
+###This calls ping for server testing with no api key
+htpp=f"http://{ip}:{port}"
+###This calls ping for server testing with api key
+http=f"http://{ip}:{port}/?api_key={apikey}"
+
 ##########################################################################################
 
 #Http call to add prompt data
@@ -106,7 +110,9 @@ http=f"http://{ip}:{port}/api/Model?api_key={apikey}&Model={model}&Prompt={promp
 #With History
 model="gpt"
 prompt="What color is an apple"
-history="{%22Question_1%22:[%22What%20color%20is%20an%20apple%22,%22red%22]}"
+history=history={"model_history":{"Question_1":["What color is an apple","red"],
+"Question_2":["What was the first question","What color is an apple"]}}
+
 http=f"http://{ip}:{port}/api/Model?api_key={apikey}&Model={model}&Prompt={prompt}&History={history}"
 
 #Hot to Request from Jira ##########################################################################################
@@ -136,7 +142,6 @@ database_url=""
 GOOGLE_API_KEY=""
 OPENAI_API_KEY = ""
 CLUADE_API_KEY = ""
-PRIVATE_GPT_PATH = '/Users/ubadahsaleh/Desktop/Multi-LLM-Agile-Assistant/PrivateGPT'
 
 #Port
 Port="364"
