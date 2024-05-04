@@ -39,8 +39,5 @@ Frontend/.vercel
 Frontend/*.tsbuildinfo
 Frontend/next-env.d.ts
 
-#Seperation of files
 
-Backend/PrivateGPT/private-gpt/
 
-Frontend/Argo-MultiLLM-UI/
